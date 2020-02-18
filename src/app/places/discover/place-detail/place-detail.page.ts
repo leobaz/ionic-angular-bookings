@@ -1,26 +1,37 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
 import { ActivatedRoute } from '@angular/router';
 import { NavController, ModalController, ActionSheetController } from '@ionic/angular';
 import { Place } from '../../place.model';
 import { PlacesService } from '../../places.service';
 import { CreateBookingComponent } from 'src/app/bookings/create-booking/create-booking.component';
+import { Subscription } from 'rxjs';
 @Component({
   selector: 'app-place-detail',
   templateUrl: './place-detail.page.html',
   styleUrls: ['./place-detail.page.scss'],
 })
-export class PlaceDetailPage implements OnInit {
+export class PlaceDetailPage implements OnInit, OnDestroy {
   place: Place;
-  constructor(private router: Router ,private route: ActivatedRoute, private navCtrl: NavController, private placesService: PlacesService, private modalCtrl: ModalController, private actionSheetCtrl: ActionSheetController) { }
+  private placeSub: Subscription;
+  constructor(
+    private router: Router,
+    private route: ActivatedRoute,
+    private navCtrl: NavController,
+    private placesService: PlacesService,
+    private modalCtrl: ModalController,
+    private actionSheetCtrl: ActionSheetController
+    ) { }
 
   ngOnInit() {
       this.route.paramMap.subscribe(paramMap => {
-        if(!paramMap.has('placeId')) {
+        if (!paramMap.has('placeId')) {
           this.navCtrl.navigateBack('/places/tabs/discover');
           return;
         }
-        this.place = this.placesService.getPlace(paramMap.get('placeId'));
+        this.placeSub = this.placesService.getPlace(paramMap.get('placeId')).subscribe(place => {
+          this.place = place;
+        });
       });
   }
 
@@ -47,7 +58,7 @@ export class PlaceDetailPage implements OnInit {
       ]
     }).then(actionSheetEl => {
       actionSheetEl.present();
-    });  
+    });
   }
 
   openBookingModal(mode: 'select' | 'random') {
@@ -59,10 +70,16 @@ export class PlaceDetailPage implements OnInit {
     })
     .then(resultData => {
       console.log(resultData.data, resultData.role);
-      if(resultData.role === 'confirm') {
+      if (resultData.role === 'confirm') {
         console.log('BOOKED!');
       }
     });
+  }
+
+  ngOnDestroy() {
+    if (this.placeSub) {
+      this.placeSub.unsubscribe();
+    }
   }
 
 }

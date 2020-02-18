@@ -20,15 +20,15 @@ export class AuthPage implements OnInit {
 
   onLogin() {
     this.isLoading = true;
+    this.authService.login();
     this.loadingCtrl.create({keyboardClose: true, message: 'Logging in...'}).then(loadingEl => {
       loadingEl.present();
       setTimeout(() => {
         this.isLoading = false;
         loadingEl.dismiss();
-        this.router.navigateByUrl('/places/tabs/discover')
+        this.router.navigateByUrl('/places/tabs/discover');
       }, 1500);
     });
-    this.authService.login();
   }
 
   onSubmit(form: NgForm) {
