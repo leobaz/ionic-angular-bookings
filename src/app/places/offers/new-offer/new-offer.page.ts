@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { PlacesService } from '../../places.service';
 import { Router } from '@angular/router';
+import { LoadingController } from '@ionic/angular';
 
 @Component({
   selector: 'app-new-offer',
@@ -11,7 +12,7 @@ import { Router } from '@angular/router';
 export class NewOfferPage implements OnInit {
   form: FormGroup;
 
-  constructor(private placesService: PlacesService, private router: Router) { }
+  constructor(private placesService: PlacesService, private router: Router, private loadingCtrl: LoadingController) { }
 
   ngOnInit() {
     this.form = new FormGroup({
@@ -42,11 +43,18 @@ export class NewOfferPage implements OnInit {
     if (!this.form.valid) {
       return;
     }
+    this.loadingCtrl.create({
+      message: 'Creating place...'
+    }).then(loadingEl => {
+      loadingEl.present();
+      this.placesService.addPlace(this.form.value.title, this.form.value.description, +this.form.value.price, new Date(this.form.value.dateFrom), new Date(this.form.value.dateFrom)).subscribe(() => {
+        loadingEl.dismiss();
+        this.router.navigate(['/places/tabs/offers']);
+        this.form.reset();
+      });
+    });
     // tslint:disable: max-line-length
-    this.placesService.addPlace(this.form.value.title, this.form.value.description, +this.form.value.price, new Date(this.form.value.dateFrom), new Date(this.form.value.dateFrom));
-    this.router.navigate(['/places/tabs/offers']);
-    this.form.reset();
-    console.log(this.placesService.places);
+    
   }
 
 }
