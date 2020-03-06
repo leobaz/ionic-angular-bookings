@@ -12,20 +12,22 @@ import { Subscription } from 'rxjs';
 })
 export class OffersPage implements OnInit, OnDestroy {
   loadedOffers: Place[];
+  isLoading = false;
   private placesSub: Subscription;
 
   constructor(private placesService: PlacesService, private router: Router) {
-    // router.events.subscribe(event => {
-    //   if (event instanceof NavigationEnd) {
-    //     this.ngOnInit();
-    //   }
-    // });
-
    }
 
   ngOnInit() {
      this.placesSub = this.placesService.places.subscribe(places => {
       this.loadedOffers = places;
+    });
+  }
+
+  ionViewWillEnter() {
+    this.isLoading = true;
+    this.placesService.fetchPlaces().subscribe(() => {
+      this.isLoading = false;
     });
   }
 
