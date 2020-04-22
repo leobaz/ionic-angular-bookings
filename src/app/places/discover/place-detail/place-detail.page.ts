@@ -8,6 +8,9 @@ import { CreateBookingComponent } from 'src/app/bookings/create-booking/create-b
 import { Subscription } from 'rxjs';
 import { BookingService } from 'src/app/bookings/booking.service';
 import { AuthService } from 'src/app/auth/auth.service';
+// tslint:disable: max-line-length
+
+
 @Component({
   selector: 'app-place-detail',
   templateUrl: './place-detail.page.html',
@@ -105,7 +108,7 @@ export class PlaceDetailPage implements OnInit, OnDestroy {
           const data = resultData.data.bookingData;
           this.bookingService.addBooking(this.place.id, this.place.title, this.place.imageUrl, data.firstName, data.lastName, data.guestNumber, data.startDate, data.endDate).subscribe(() => {
             loadingEl.dismiss();
-          })
+          });
         });
       }
     });
