@@ -16,7 +16,7 @@ import { Plugins, Capacitor } from '@capacitor/core';
 export class LocationPickerComponent implements OnInit {
   @Output() locationPick = new EventEmitter<PlaceLocation>();
   selectedLocationImage: string;
-  isLoading = true;
+  isLoading = false;
   constructor(
     private modalCtrl: ModalController,
     private http: HttpClient,
