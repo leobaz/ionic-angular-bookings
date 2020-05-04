@@ -3,6 +3,7 @@ import { FormGroup, FormControl, Validators } from '@angular/forms';
 import { PlacesService } from '../../places.service';
 import { Router } from '@angular/router';
 import { LoadingController } from '@ionic/angular';
+import { PlaceLocation } from '../../location.model';
 
 @Component({
   selector: 'app-new-offer',
@@ -35,8 +36,15 @@ export class NewOfferPage implements OnInit {
       dateTo: new FormControl(null, {
         updateOn: 'blur',
         validators: [Validators.required]
+      }),
+      location: new FormControl(null, {
+        validators: [Validators.required]
       })
     });
+  }
+
+  onLocationPicked(location: PlaceLocation) {
+    this.form.patchValue({location: location});
   }
 
   onCreateOffer() {
@@ -47,14 +55,13 @@ export class NewOfferPage implements OnInit {
       message: 'Creating place...'
     }).then(loadingEl => {
       loadingEl.present();
-      this.placesService.addPlace(this.form.value.title, this.form.value.description, +this.form.value.price, new Date(this.form.value.dateFrom), new Date(this.form.value.dateTo)).subscribe(() => {
+      // tslint:disable-next-line: max-line-length
+      this.placesService.addPlace(this.form.value.title, this.form.value.description, +this.form.value.price, new Date(this.form.value.dateFrom), new Date(this.form.value.dateTo), this.form.value.location).subscribe(() => {
         loadingEl.dismiss();
         this.router.navigate(['/places/tabs/offers']);
         this.form.reset();
       });
     });
-    // tslint:disable: max-line-length
-    
   }
 
 }

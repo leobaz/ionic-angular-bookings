@@ -4,6 +4,7 @@ import { AuthService } from '../auth/auth.service';
 import { BehaviorSubject, concat, of } from 'rxjs';
 import { take, map, tap, delay, switchMap } from 'rxjs/operators';
 import { HttpClient } from '@angular/common/http';
+import { PlaceLocation } from './location.model';
 // tslint:disable: max-line-length
 
 // [
@@ -21,6 +22,7 @@ interface PlaceData {
   price: number;
   title: string;
   userId: string;
+  location: PlaceLocation;
 }
 
 @Injectable({
@@ -48,7 +50,8 @@ export class PlacesService {
             data[key].price,
             new Date(data[key].availableFrom),
             new Date(data[key].availableFrom),
-            data[key].userId
+            data[key].userId,
+            data[key].location
             ));
         }
       }
@@ -69,12 +72,13 @@ export class PlacesService {
         data.price,
         new Date(data.availableFrom),
         new Date(data.availableTo),
-        data.userId
+        data.userId,
+        data.location
         );
     }));
   }
 
-  addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date) {
+  addPlace(title: string, description: string, price: number, dateFrom: Date, dateTo: Date, location: PlaceLocation) {
     let generatedId: string;
     const newPlace = new Place(
       Math.random().toString(),
@@ -83,7 +87,8 @@ export class PlacesService {
       price,
       dateFrom,
       dateTo,
-      this.authService.userId
+      this.authService.userId,
+      location
       );
     return this.http.post<{name: string}>('https://ionic-angular-bookings-531f1.firebaseio.com/offered-places.json', { ...newPlace, id: null }).pipe(switchMap(data => {
       generatedId = data.name;
@@ -119,7 +124,8 @@ export class PlacesService {
         oldPlace.price,
         oldPlace.availableFrom,
         oldPlace.availableTo,
-        oldPlace.userId
+        oldPlace.userId,
+        oldPlace.location
         );
       return this.http.put(`https://ionic-angular-bookings-531f1.firebaseio.com/offered-places/${placeId}.json`, {...updatedPlaces[updatedPlaceIndex], id: null});
     }), tap(() => {
